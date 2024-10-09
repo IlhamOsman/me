@@ -1,4 +1,5 @@
 import random
+#if _name_ == "_main_":
 
 def main():
     print("Guess the number!")
