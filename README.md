@@ -1,49 +1,69 @@
-# Step 1: Efficient function definitions
-def get_input(prompt):
-    return input(prompt)
+# Part 1: Display Heading and Menu
+def display_menu():
+    print("\nCountry Information System")
+    print("1. View all countries")
+    print("2. Add a country")
+    print("3. Delete a country")
+    print("4. Exit\n")
 
-def get_numeric_input(prompt):
-    return float(input(prompt))
+# Part 2: Prepopulate the dictionary with at least 3 countries
+def prepopulate_countries():
+    return {
+        'USA': 'Population: 331M, Capital: Washington D.C.',
+        'Canada': 'Population: 37M, Capital: Ottawa',
+        'Mexico': 'Population: 128M, Capital: Mexico City'
+    }
 
-def calculate_pay(hours, rate, tax_rate):
-    gross = hours * rate
-    tax = gross * tax_rate
-    net = gross - tax
-    return gross, tax, net
+# Part 3: View a Country (Loop through and display keys, prompt user for input)
+def view_countries(countries):
+    print("\nCountries available: ")
+    for country in countries:
+        print(country)
+    
+    country = input("Enter the name of the country to view: ").capitalize()
+    if country in countries:
+        print(f"{country}: {countries[country]}")
+    else:
+        print("Country not found.")
 
-def display_employee_info(name, hours, rate, gross, tax_rate, tax, net):
-    print(f"\nEmployee: {name}\nHours Worked: {hours}\nHourly Rate: {rate}")
-    print(f"Gross Pay: {gross}\nTax Rate: {tax_rate * 100}%\nTax: {tax}\nNet Pay: {net}\n")
+# Add a country (Check if it already exists)
+def add_country(countries):
+    country = input("Enter the name of the country to add: ").capitalize()
+    if country in countries:
+        print("Country already exists.")
+    else:
+        info = input(f"Enter the data for {country}: ")
+        countries[country] = info
+        print(f"{country} added successfully.")
 
-def display_totals(count, total_hours, total_gross, total_tax, total_net):
-    print(f"\nEmployees Processed: {count}\nTotal Hours: {total_hours}")
-    print(f"Total Gross Pay: {total_gross}\nTotal Tax: {total_tax}\nTotal Net Pay: {total_net}\n")
+# Delete a country (Remove a country from the dictionary)
+def delete_country(countries):
+    country = input("Enter the name of the country to delete: ").capitalize()
+    if country in countries:
+        del countries[country]
+        print(f"{country} deleted successfully.")
+    else:
+        print("Country not found.")
 
-# Step 2: Efficient main loop
+# Main program loop
 def main():
-    employee_count, total_hours, total_gross, total_tax, total_net = 0, 0, 0, 0, 0
-
+    countries = prepopulate_countries()  # Prepopulate with 3 countries
+    
     while True:
-        if get_input("Enter 'End' to stop or press Enter to continue: ").lower() == "end":
+        display_menu()  # Show the menu options
+        choice = input("Enter your choice (1-4): ")
+
+        if choice == '1':  # View all countries
+            view_countries(countries)
+        elif choice == '2':  # Add a country
+            add_country(countries)
+        elif choice == '3':  # Delete a country
+            delete_country(countries)
+        elif choice == '4':  # Exit the program
+            print("Exiting the program.")
             break
-        
-        name = get_input("Enter employee name: ")
-        hours = get_numeric_input("Enter hours worked: ")
-        rate = get_numeric_input("Enter hourly rate: ")
-        tax_rate = get_numeric_input("Enter tax rate (in %): ") / 100
-        
-        gross, tax, net = calculate_pay(hours, rate, tax_rate)
-        
-        display_employee_info(name, hours, rate, gross, tax_rate, tax, net)
-        
-        employee_count += 1
-        total_hours += hours
-        total_gross += gross
-        total_tax += tax
-        total_net += net
+        else:
+            print("Invalid choice. Please try again.")  # Handle invalid input
 
-    display_totals(employee_count, total_hours, total_gross, total_tax, total_net)
-
-# Step 3: Execute main function
 if _name_ == "_main_":
-    main()
+    main()  # Run the program
