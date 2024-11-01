@@ -1,52 +1,88 @@
-# Movie List Program
+# Import datetime for date handling
+from datetime import datetime
 
-movies = ["Monty Python and the Holy Grail", "On the Waterfront", "Cat on a Hot Tin Roof"]
+# Function to input and return dates
+def get_dates():
+    """Prompts user for 'from' and 'to' dates and returns them."""
+    return input("Enter from date (mm/dd/yyyy): "), input("Enter to date (mm/dd/yyyy): ")
 
-def show_menu():
-    print("\nCOMMAND MENU")
-    print("list - List all movies")
-    print("add - Add a movie")
-    print("del - Delete a movie")
-    print("exit - Exit program")
+# Function to calculate pay details
+def calculate_pay(hours, rate, tax_rate):
+    """Calculates gross pay, tax, and net pay based on hours, rate, and tax rate."""
+    gross = hours * rate
+    tax = gross * tax_rate
+    return gross, tax, gross - tax  # Returning multiple values efficiently
 
-def list_movies():
-    if len(movies) == 0:
-        print("No movies to display.")
-    else:
-        for i, movie in enumerate(movies, start=1):
-            print(f"{i}. {movie}")
+# Function to display individual employee information
+def display_employee_info(from_date, to_date, name, hours, rate, gross, tax_rate, tax, net):
+    """Displays details for a single employee."""
+    print(f"\nFrom Date: {from_date} To Date: {to_date}")
+    print(f"Employee Name: {name}")
+    print(f"Hours Worked: {hours}, Hourly Rate: ${rate:.2f}")
+    print(f"Gross Pay: ${gross:.2f}, Income Tax Rate: {tax_rate * 100:.1f}%")
+    print(f"Income Tax: ${tax:.2f}, Net Pay: ${net:.2f}\n")
 
-def add_movie():
-    name = input("Name: ")
-    movies.append(name)
-    print(f"{name} was added.")
+# Function to display total summary
+def display_totals(totals):
+    """Displays cumulative totals for all employees processed."""
+    print("\n--- Totals ---")
+    print(f"Total Number of Employees: {totals['employee_count']}")
+    print(f"Total Hours Worked: {totals['total_hours']}")
+    print(f"Total Gross Pay: ${totals['total_gross']:.2f}")
+    print(f"Total Income Tax: ${totals['total_tax']:.2f}")
+    print(f"Total Net Pay: ${totals['total_net']:.2f}\n")
 
-def delete_movie():
-    try:
-        number = int(input("Number: "))
-        if 1 <= number <= len(movies):
-            movie = movies.pop(number - 1)
-            print(f"{movie} was deleted.")
-        else:
-            print("Invalid movie number.")
-    except ValueError:
-        print("Invalid input. Please enter a valid movie number.")
-
+# Main function
 def main():
-    show_menu()
-    while True:
-        command = input("\nCommand: ").lower()
-        if command == "list":
-            list_movies()
-        elif command == "add":
-            add_movie()
-        elif command == "del":
-            delete_movie()
-        elif command == "exit":
-            print("Bye!")
-            break
-        else:
-            print("Not a valid command. Please try again.")
+    employees = []  # List to store each employee's data
+    totals = {  # Dictionary to store cumulative totals
+        'employee_count': 0,
+        'total_hours': 0,
+        'total_gross': 0,
+        'total_tax': 0,
+        'total_net': 0
+    }
 
-if _name_ == "_main_":
+    while True:
+        if input("Enter 'End' to stop or press Enter to continue: ").strip().lower() == "end":
+            break
+
+        # Gather employee data
+        from_date, to_date = get_dates()
+        name = input("Enter employee name: ")
+        hours = float(input("Enter hours worked: "))
+        rate = float(input("Enter hourly rate: "))
+        tax_rate = float(input("Enter tax rate (in %): ")) / 100
+
+        # Calculate pay details
+        gross, tax, net = calculate_pay(hours, rate, tax_rate)
+
+        # Display individual employee information
+        display_employee_info(from_date, to_date, name, hours, rate, gross, tax_rate, tax, net)
+
+        # Append employee data to list
+        employees.append({
+            'from_date': from_date,
+            'to_date': to_date,
+            'name': name,
+            'hours': hours,
+            'rate': rate,
+            'gross': gross,
+            'tax_rate': tax_rate,
+            'tax': tax,
+            'net': net
+        })
+
+        # Update totals in the dictionary
+        totals['employee_count'] += 1
+        totals['total_hours'] += hours
+        totals['total_gross'] += gross
+        totals['total_tax'] += tax
+        totals['total_net'] += net
+
+    # Display totals at the end of the loop
+    display_totals(totals)
+
+# Run the program
+if __name__ == "__main__":
     main()
