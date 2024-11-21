@@ -21,11 +21,16 @@ def rectangle_calculator():
         # Draw the rectangle using asterisks
         print("Rectangle:")
         for i in range(height):
-            if i == 0 or i == height - 1:
+            if i == 0 or i == height - 1:  # Top and bottom rows
                 print("*" * width)
-            else:
+            else:  # Middle rows with spaces inside
                 print("" + " " * (width - 2) + "")
         
+        # Display the height using asterisks
+        print("\nHeight visualization:")
+        for _ in range(height):
+            print("*")
+
         # Ask user if they want to continue
         cont = input("Continue? (y/n): ").lower()
         if cont != 'y':
