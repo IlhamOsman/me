@@ -1,41 +1,33 @@
-def rectangle_calculator():
-    while True:
-        print("Rectangle Calculator")
-        
-        # Get height and width from the user
-        try:
-            height = int(input("Height: "))
-            width = int(input("Width: "))
-        except ValueError:
-            print("Please enter valid integers for height and width.")
-            continue
-        
-        # Calculate perimeter and area
-        perimeter = 2 * (height + width)
-        area = height * width
+# Rectangle Calculator Program
+while True:
+    print("\nRectangle Calculator")
+    
+    # Input height and width from user
+    try:
+        height = int(input("Height: "))
+        width = int(input("Width: "))
+    except ValueError:
+        print("Invalid input! Please enter valid integers for height and width.")
+        continue
 
-        # Display results
-        print(f"Perimeter: {perimeter}")
-        print(f"Area: {area}")
-        
-        # Draw the rectangle using asterisks
-        print("Rectangle:")
-        for i in range(height):
-            if i == 0 or i == height - 1:  # Top and bottom rows
-                print("*" * width)
-            else:  # Middle rows with spaces inside
-                print("" + " " * (width - 2) + "")
-        
-        # Display the height using asterisks
-        print("\nHeight visualization:")
-        for _ in range(height):
-            print("*")
+    # Calculate the perimeter and area
+    perimeter = 2 * (height + width)
+    area = height * width
 
-        # Ask user if they want to continue
-        cont = input("Continue? (y/n): ").lower()
-        if cont != 'y':
-            print("Goodbye!")
-            break
+    # Display the results
+    print(f"Perimeter: {perimeter}")
+    print(f"Area: {area}")
 
-# Run the rectangle calculator
-rectangle_calculator()
+    # Print the rectangle border
+    print("Rectangle:")
+    for row in range(height):
+        if row == 0 or row == height - 1:  # Top and bottom border
+            print("* " * width)
+        else:  # Middle rows with spaces
+            print("* " + "  " * (width - 2) + "* ")
+
+    # Prompt to continue or exit
+    continue_choice = input("Continue? (y/n): ").strip().lower()
+    if continue_choice != 'y':
+        print("Goodbye!")
+        break
