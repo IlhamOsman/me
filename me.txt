@@ -1,1 +1,3 @@
-Ilham imuhaba282@gmail.com
+admin|admin123|Admin
+user1|password1|User
+user2|password2|User
