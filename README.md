@@ -3,6 +3,7 @@ class Login:
     Class to represent a user login with three properties: user_id, password, and authorization.
     """
     def _init_(self, user_id, password, authorization):
+        # Constructor to initialize the properties of the class
         self.user_id = user_id
         self.password = password
         self.authorization = authorization
@@ -17,7 +18,7 @@ def read_user_data(filename):
         with open(filename, "r") as file:
             for line in file:
                 user_id, password, authorization = line.strip().split("|")
-                user_list.append(Login(user_id, password, authorization))
+                user_list.append(Login(user_id, password, authorization))  # Creating Login object with 3 parameters
     except FileNotFoundError:
         print("No user data found. Please ensure the file exists.")
     return user_list
