@@ -1,123 +1,125 @@
-# Import necessary modules
-from datetime import datetime
-
-# Define the Login class
 class Login:
+    """
+    Class to represent a user login with three properties: user_id, password, and authorization.
+    """
     def _init_(self, user_id, password, authorization):
         self.user_id = user_id
         self.password = password
         self.authorization = authorization
 
-# Function to read login data from a file
-def load_login_data(file_name):
-    """Loads login data from a file into a list of Login objects."""
-    login_list = []
+
+def read_user_data(filename):
+    """
+    Reads user data from the file and stores it in a list of Login objects.
+    """
+    user_list = []
     try:
-        with open(file_name, "r") as file:
+        with open(filename, "r") as file:
             for line in file:
                 user_id, password, authorization = line.strip().split("|")
-                login_list.append(Login(user_id, password, authorization))
+                user_list.append(Login(user_id, password, authorization))
     except FileNotFoundError:
-        print("Login data file not found. Please create 'login_data.txt' with user credentials.")
-    return login_list
+        print("No user data found. Please ensure the file exists.")
+    return user_list
 
-# Function to handle the login process
-def login_process(login_list):
-    """Handles the login process with user validation."""
+
+def validate_and_store_user_data(filename, user_list):
+    """
+    Collects and validates user data, then writes it to the file.
+    """
+    while True:
+        user_id = input("Enter User ID (or type 'End' to stop): ").strip()
+        if user_id.lower() == "end":
+            break
+
+        if any(user.user_id == user_id for user in user_list):
+            print("Error: User ID already exists. Please try again.")
+            continue
+
+        password = input("Enter Password: ").strip()
+        authorization_code = input("Enter Authorization Code (Admin/User): ").strip()
+
+        if authorization_code not in ["Admin", "User"]:
+            print("Error: Invalid Authorization Code. Please enter 'Admin' or 'User'.")
+            continue
+
+        # Append new user to the list and write to file
+        new_user = Login(user_id, password, authorization_code)
+        user_list.append(new_user)
+
+        with open(filename, "a") as file:
+            file.write(f"{user_id}|{password}|{authorization_code}\n")
+
+        print("User data successfully added!\n")
+
+
+def login_process(user_list):
+    """
+    Handles the login process:
+    - Verifies user ID and password.
+    - Creates a Login object if credentials are valid.
+    - Grants access based on authorization code.
+    """
     user_id = input("Enter User ID: ").strip()
     password = input("Enter Password: ").strip()
 
-    # Validate User ID and Password
-    for login in login_list:
-        if login.user_id == user_id:
-            if login.password == password:
-                print(f"\nWelcome, {user_id}!")
-                print(f"Authorization Level: {login.authorization}\n")
-                # Create a Login object and store properties
-                current_user = Login(user_id, password, login.authorization)
-                if current_user.authorization == "Admin":
-                    print("Access granted: Admin privileges (can view and edit data).")
-                    handle_admin_tasks()
-                elif current_user.authorization == "User":
-                    print("Access granted: User privileges (can view data only).")
-                    handle_user_tasks()
+    # Validate user ID and password
+    for user in user_list:
+        if user.user_id == user_id:
+            if user.password == password:
+                print("\nLogin Successful!")
+                print(f"User ID: {user.user_id}, Password: {user.password}, Authorization: {user.authorization}")
+                
+                # Check authorization
+                if user.authorization == "Admin":
+                    print("\nAuthorization: Admin - Full Access Granted.")
+                    display_all_user_data(user_list)  # Admin can display all data
+                elif user.authorization == "User":
+                    print("\nAuthorization: User - Limited Access Granted.")
+                    display_user_data(user)  # User can only view their own data
                 return
             else:
-                print("Invalid password. Access denied.")
+                print("\nError: Incorrect Password.")
                 return
-    print("Invalid User ID. Access denied.")
 
-# Function to handle admin-specific tasks
-def handle_admin_tasks():
-    """Allows admin to view and edit data."""
-    print("\nAdmin Menu:")
-    print("1. View all records")
-    print("2. Add a new record")
-    choice = input("Enter your choice: ")
+    print("\nError: User ID not found.")
+    exit()
 
-    if choice == "1":
-        filter_date = input("\nEnter 'All' to display all records or a specific 'From Date' (mm/dd/yyyy): ")
-        read_and_display_records(filter_date)
-    elif choice == "2":
-        main()  # Call the main function to add new records
-    else:
-        print("Invalid choice.")
 
-# Function to handle user-specific tasks
-def handle_user_tasks():
-    """Allows users to view data only."""
-    filter_date = input("\nEnter 'All' to display all records or a specific 'From Date' (mm/dd/yyyy): ")
-    read_and_display_records(filter_date)
+def display_user_data(user):
+    """
+    Displays the details of a single user.
+    """
+    print("\n--- User Details ---")
+    print(f"User ID: {user.user_id}")
+    print(f"Password: {user.password}")
+    print(f"Authorization Code: {user.authorization}")
 
-# Function to read and display records
-def read_and_display_records(filter_date):
-    """Reads and displays records based on the given filter date."""
-    try:
-        with open("employee_data.txt", "r") as file:
-            print("\n--- Employee Records ---")
-            totals = {
-                'employee_count': 0,
-                'total_hours': 0,
-                'total_gross': 0,
-                'total_tax': 0,
-                'total_net': 0
-            }
-            for line in file:
-                record = line.strip().split("|")
-                from_date = record[0]
-                if filter_date == "All" or filter_date == from_date:
-                    to_date, name, hours, rate, gross, tax_rate, tax, net = record[1:]
-                    hours, rate, gross, tax, net, tax_rate = map(float, [hours, rate, gross, tax, net, tax_rate])
-                    print(f"From Date: {from_date} To Date: {to_date}")
-                    print(f"Employee Name: {name}")
-                    print(f"Hours Worked: {hours}, Hourly Rate: ${rate:.2f}")
-                    print(f"Gross Pay: ${gross:.2f}, Tax: ${tax:.2f}, Net Pay: ${net:.2f}\n")
 
-                    totals['employee_count'] += 1
-                    totals['total_hours'] += hours
-                    totals['total_gross'] += gross
-                    totals['total_tax'] += tax
-                    totals['total_net'] += net
+def display_all_user_data(user_list):
+    """
+    Displays details of all users along with totals.
+    """
+    print("\n--- All User Data ---")
+    total_users = len(user_list)
+    for user in user_list:
+        print(f"User ID: {user.user_id}, Password: {user.password}, Authorization: {user.authorization}")
 
-            print("\n--- Totals ---")
-            print(f"Total Number of Employees: {totals['employee_count']}")
-            print(f"Total Hours Worked: {totals['total_hours']}")
-            print(f"Total Gross Pay: ${totals['total_gross']:.2f}")
-            print(f"Total Tax: ${totals['total_tax']:.2f}")
-            print(f"Total Net Pay: ${totals['total_net']:.2f}\n")
-    except FileNotFoundError:
-        print("No employee data found.")
+    print(f"\nTotal Users: {total_users}")
 
-# Main function
+
 def main():
-    # Load login data
-    login_list = load_login_data("login_data.txt")
+    filename = "user_data.txt"
 
-    # Perform login process
-    if not login_list:
-        return  # Exit if login data is not loaded
-    login_process(login_list)
+    # Step 1: Read user data from the file and store in a list of Login objects
+    user_list = read_user_data(filename)
 
-# Run the program
+    # Step 2: Collect and store new user data
+    validate_and_store_user_data(filename, user_list)
+
+    # Step 3: Start the login process
+    login_process(user_list)
+
+
 if _name_ == "_main_":
     main()
