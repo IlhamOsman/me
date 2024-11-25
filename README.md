@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-
+#credentials.txt
 # Function to authenticate user
 def authenticate_user():
     """Authenticates a user by username and password."""
