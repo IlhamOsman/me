@@ -70,8 +70,16 @@ def display_totals(totals):
 def write_to_file(employee):
     """Writes employee data to a text file in a pipe-delimited format."""
     with open("employee_data.txt", "a") as file:
-        file.write(f"{employee['from_date']}|{employee['to_date']}|{employee['name']}|{employee['hours']}|"
-                   f"{employee['rate']}|{employee['gross']}|{employee['tax_rate']}|{employee['tax']}|{employee['net']}\n")
+        file.write(f"{employee['from_date']}|{employee['to_date']}|{employee['name']}|{employee['username']}|"
+                   f"{employee['password']}|{employee['hours']}|{employee['rate']}|{employee['gross']}|"
+                   f"{employee['tax_rate']}|{employee['tax']}|{employee['net']}\n")
+
+
+# Function to write user credentials to c.txt
+def write_credentials(username, password):
+    """Writes username and password to the credentials file."""
+    with open("c.txt", "a") as file:
+        file.write(f"{username}|{password}|employee\n")
 
 
 # Admin functions
@@ -80,21 +88,18 @@ def admin_menu():
     while True:
         print("\n--- Admin Menu ---")
         print("1. Add Employee Payroll Data")
-        print("2. Add User")
-        print("3. View All Payroll Records")
-        print("4. Generate Payroll Summary")
-        print("5. Exit")
+        print("2. View All Payroll Records")
+        print("3. Generate Payroll Summary")
+        print("4. Exit")
 
         choice = input("Enter your choice: ")
         if choice == "1":
             add_employee_data()
         elif choice == "2":
-            add_user()
-        elif choice == "3":
             read_and_display_records("All")
-        elif choice == "4":
+        elif choice == "3":
             generate_summary()
-        elif choice == "5":
+        elif choice == "4":
             break
         else:
             print("Invalid choice. Please try again.")
@@ -108,6 +113,10 @@ def add_employee_data():
     rate = float(input("Enter hourly rate: "))
     tax_rate = float(input("Enter tax rate (in %): ")) / 100
 
+    # Get username and password for the employee
+    username = input("Enter employee username: ")
+    password = input("Enter employee password: ")
+
     gross, tax, net = calculate_pay(hours, rate, tax_rate)
 
     # Create employee record
@@ -115,6 +124,8 @@ def add_employee_data():
         'from_date': from_date,
         'to_date': to_date,
         'name': name,
+        'username': username,
+        'password': password,
         'hours': hours,
         'rate': rate,
         'gross': gross,
@@ -122,23 +133,41 @@ def add_employee_data():
         'tax': tax,
         'net': net
     }
+
     write_to_file(employee)
-    print("Employee payroll data added successfully.")
+    write_credentials(username, password)  # Write to c.txt for authentication
+    print("Employee payroll data and credentials added successfully.")
 
 
-def add_user():
-    """Allows admin to add a new user."""
-    username = input("Enter new username: ")
-    password = input("Enter new password: ")
-    role = input("Enter role (admin/employee): ").lower()
+def read_and_display_records(filter_date):
+    """Displays all employee records filtered by a specific date."""
+    try:
+        with open("employee_data.txt", "r") as file:
+            print("\n--- Employee Records ---")
+            totals = {
+                'employee_count': 0,
+                'total_hours': 0,
+                'total_gross': 0,
+                'total_tax': 0,
+                'total_net': 0
+            }
+            for line in file:
+                record = line.strip().split("|")
+                from_date = record[0]
+                if filter_date == "All" or filter_date == from_date:
+                    to_date, name, username, password, hours, rate, gross, tax_rate, tax, net = record[1:]
+                    hours, rate, gross, tax, net, tax_rate = map(float, [hours, rate, gross, tax, net, tax_rate])
+                    display_employee_info(from_date, to_date, name, hours, rate, gross, tax_rate, tax, net)
 
-    if role not in ["admin", "employee"]:
-        print("Invalid role. User not added.")
-        return
+                    totals['employee_count'] += 1
+                    totals['total_hours'] += hours
+                    totals['total_gross'] += gross
+                    totals['total_tax'] += tax
+                    totals['total_net'] += net
 
-    with open("c.txt", "a") as file:
-        file.write(f"{username}|{password}|{role}\n")
-    print("User added successfully.")
+            display_totals(totals)
+    except FileNotFoundError:
+        print("No employee data found.")
 
 
 # Employee functions
@@ -165,8 +194,10 @@ def read_and_display_records_for_employee(username):
             print("\n--- Your Payroll Records ---")
             for line in file:
                 record = line.strip().split("|")
-                if record[2] == username:  # Check if username matches
-                    display_employee_info(*record)
+                if record[3] == username:  # Check if username matches
+                    from_date, to_date, name, username, password, hours, rate, gross, tax_rate, tax, net = record
+                    hours, rate, gross, tax, net, tax_rate = map(float, [hours, rate, gross, tax, net, tax_rate])
+                    display_employee_info(from_date, to_date, name, hours, rate, gross, tax_rate, tax, net)
                     return
             print("No records found for you.")
     except FileNotFoundError:
@@ -187,5 +218,5 @@ def main():
         print("Unauthorized access.")
 
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
