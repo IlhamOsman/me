@@ -1,11 +1,11 @@
 import os
 from datetime import datetime
-#credentials.txt
+
 # Function to authenticate user
 def authenticate_user():
     """Authenticates a user by username and password."""
     try:
-        with open("credentials.txt", "r") as file:
+        with open("c.txt", "r") as file:
             credentials = [line.strip().split("|") for line in file]
     except FileNotFoundError:
         print("No credentials found. Please set up users.")
@@ -80,18 +80,21 @@ def admin_menu():
     while True:
         print("\n--- Admin Menu ---")
         print("1. Add Employee Payroll Data")
-        print("2. View All Payroll Records")
-        print("3. Generate Payroll Summary")
-        print("4. Exit")
+        print("2. Add User")
+        print("3. View All Payroll Records")
+        print("4. Generate Payroll Summary")
+        print("5. Exit")
 
         choice = input("Enter your choice: ")
         if choice == "1":
             add_employee_data()
         elif choice == "2":
-            read_and_display_records("All")
+            add_user()
         elif choice == "3":
-            generate_summary()
+            read_and_display_records("All")
         elif choice == "4":
+            generate_summary()
+        elif choice == "5":
             break
         else:
             print("Invalid choice. Please try again.")
@@ -123,35 +126,19 @@ def add_employee_data():
     print("Employee payroll data added successfully.")
 
 
-def read_and_display_records(filter_date):
-    """Displays all employee records filtered by a specific date."""
-    try:
-        with open("employee_data.txt", "r") as file:
-            print("\n--- Employee Records ---")
-            totals = {
-                'employee_count': 0,
-                'total_hours': 0,
-                'total_gross': 0,
-                'total_tax': 0,
-                'total_net': 0
-            }
-            for line in file:
-                record = line.strip().split("|")
-                from_date = record[0]
-                if filter_date == "All" or filter_date == from_date:
-                    to_date, name, hours, rate, gross, tax_rate, tax, net = record[1:]
-                    hours, rate, gross, tax, net, tax_rate = map(float, [hours, rate, gross, tax, net, tax_rate])
-                    display_employee_info(from_date, to_date, name, hours, rate, gross, tax_rate, tax, net)
+def add_user():
+    """Allows admin to add a new user."""
+    username = input("Enter new username: ")
+    password = input("Enter new password: ")
+    role = input("Enter role (admin/employee): ").lower()
 
-                    totals['employee_count'] += 1
-                    totals['total_hours'] += hours
-                    totals['total_gross'] += gross
-                    totals['total_tax'] += tax
-                    totals['total_net'] += net
+    if role not in ["admin", "employee"]:
+        print("Invalid role. User not added.")
+        return
 
-            display_totals(totals)
-    except FileNotFoundError:
-        print("No employee data found.")
+    with open("c.txt", "a") as file:
+        file.write(f"{username}|{password}|{role}\n")
+    print("User added successfully.")
 
 
 # Employee functions
@@ -200,5 +187,5 @@ def main():
         print("Unauthorized access.")
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
