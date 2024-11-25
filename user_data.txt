@@ -1,0 +1,5 @@
+
+admin123|adminpass|Admin
+user456|userpass|User
+testuser|testpass|Admin
+guest001|guestpass|User
